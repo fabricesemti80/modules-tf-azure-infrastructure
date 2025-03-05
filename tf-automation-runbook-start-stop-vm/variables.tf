@@ -1,19 +1,64 @@
 variable "location" {
   type        = string
-  description = "Location of Runbook"
+  description = "Azure region where the Automation Runbook resources will be deployed"
   default     = "uksouth"
 }
+
 variable "env" {
-  type = string
+  type        = string
+  description = "Environment name (e.g., dev, test, prod) for resource naming and tagging"
 }
+
 variable "product" {
-  type = string
+  type        = string
+  description = "Product or project name for resource naming and tagging"
 }
+
 variable "tags" {
   type        = map(string)
-  description = "Runbook Tags"
+  description = "Map of tags to be applied to all resources created by this module"
 }
-## Azure Automation
+
+variable "resource_group_name" {
+  type        = string
+  description = "Name of the resource group where the Automation Account will be deployed"
+}
+
+variable "target_resource_group_name" {
+  type        = string
+  description = "Optional target resource group name containing VMs to be managed (overrides the default resource group)"
+  default     = null
+}
+
+variable "automation_account_name" {
+  type        = string
+  description = "Name of the Azure Automation Account to be created or used"
+}
+
+variable "timezone" {
+  type        = string
+  description = "Timezone to use for scheduling runbooks (IANA time zone format)"
+  default     = "Europe/London"
+}
+
+variable "vm_names" {
+  type        = list(string)
+  description = "List of virtual machine names to be targeted by the start/stop runbook"
+  default     = []
+}
+
+variable "subscription_name" {
+  type        = string
+  description = "Name of the Azure subscription containing the target VMs"
+  default     = "Subscription name to target"
+}
+
+variable "target_subscription_name" {
+  type        = string
+  description = "Optional override for the subscription name containing the target VMs"
+  default     = null
+}
+
 variable "schedules" {
   type = list(object({
     name       = string
@@ -28,7 +73,8 @@ variable "schedules" {
       occurrence = optional(number)
     }))
   }))
-  default = []
+  description = "List of schedule configurations for starting or stopping VMs. Each schedule defines when and how VMs should be started or stopped."
+  default     = []
 
   validation { # Check no interval for OneTime
     condition = alltrue(flatten([
@@ -89,35 +135,4 @@ variable "schedules" {
     ])
     error_message = "Occurrence of the week within the month must be between 1 and 5 or -1 for last week within the month."
   }
-
-}
-variable "resource_group_name" {
-  type = string
-}
-variable "automation_account_name" {
-  type        = string
-  description = "automation account name"
-}
-variable "timezone" {
-  type    = string
-  default = "Europe/London"
-}
-variable "vm_names" {
-  type    = list(string)
-  default = []
-}
-variable "subscription_name" {
-  type    = string
-  default = "Subscription name to target"
-}
-variable "target_subscription_name" {
-  description = "Optional target subscription name to override the default subscription name."
-  type        = string
-  default     = null
-}
-
-variable "target_resource_group_name" {
-  description = "Optional target resource group name to override the default resource group name."
-  type        = string
-  default     = null
 }
