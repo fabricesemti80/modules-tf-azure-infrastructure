@@ -1,6 +1,8 @@
 # Bastion Host Configuration Variables
 
-# ## ? Core Identification Variables
+#------------------------------------------------------------------------------
+# Core Identification Variables
+#------------------------------------------------------------------------------
 
 variable "bastion_host_name" {
   type        = string
@@ -25,7 +27,10 @@ variable "location" {
   }
 }
 
-## ? Network Configuration Variables
+#------------------------------------------------------------------------------
+# Network Configuration Variables
+#------------------------------------------------------------------------------
+
 variable "bastion_subnet_id" {
   type        = string
   description = "The fully qualified resource ID of the subnet where the Bastion host will be deployed."
@@ -44,7 +49,10 @@ variable "bastion_subnet_prefix" {
   }
 }
 
-## ? Bastion Host Feature Configuration
+#------------------------------------------------------------------------------
+# Bastion Host Feature Configuration
+#------------------------------------------------------------------------------
+
 variable "bastion_sku" {
   type        = string
   default     = "Standard"
@@ -64,7 +72,10 @@ variable "bastion_scale" {
   }
 }
 
-## ? Bastion Session Feature Toggles
+#------------------------------------------------------------------------------
+# Bastion Session Feature Toggles
+#------------------------------------------------------------------------------
+
 variable "bastion_features" {
   type = object({
     copy_paste_enabled     = bool
@@ -81,7 +92,10 @@ variable "bastion_features" {
   description = "Configuration object for Bastion host session features."
 }
 
-## ? Tagging Variables
+#------------------------------------------------------------------------------
+# Tagging Variables
+#------------------------------------------------------------------------------
+
 variable "tags" {
   type        = map(string)
   description = "A map of tags to apply to all resources created by this module."
