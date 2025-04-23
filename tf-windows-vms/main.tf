@@ -68,7 +68,7 @@ resource "azurerm_windows_virtual_machine" "windows_vm" {
   lifecycle {
     ignore_changes = [
       tags["CreationTimeUTC"],
-      # identity,
+      identity[0].identity_ids,
       vm_agent_platform_updates_enabled
     ]
   }
