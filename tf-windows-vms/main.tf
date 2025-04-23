@@ -45,9 +45,6 @@ resource "azurerm_windows_virtual_machine" "windows_vm" {
   license_type        = var.windows_license_type
 
   # Enable system-assigned managed identity if specified
-  identity {
-    type = var.enable_system_managed_identity ? "SystemAssigned" : null
-  }
 
   os_disk {
     name                 = "${each.value.name}-osdisk"
