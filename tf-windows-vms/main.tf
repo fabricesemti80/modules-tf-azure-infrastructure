@@ -57,6 +57,10 @@ resource "azurerm_windows_virtual_machine" "windows_vm" {
     version   = each.value.source_image_reference.version
   }
 
+  identity {
+    type = "SystemAssigned"
+  }
+
   # vtpm_enabled = true #TODO: Enable when we have a plan to support it
 
   tags = var.tags
