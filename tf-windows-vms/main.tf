@@ -45,6 +45,9 @@ resource "azurerm_windows_virtual_machine" "windows_vm" {
   license_type        = var.windows_license_type
 
   # Enable system-assigned managed identity if specified
+  identity {
+    type = var.enable_system_managed_identity ? "SystemAssigned" : null
+  }
 
   os_disk {
     name                 = "${each.value.name}-osdisk"
@@ -65,7 +68,7 @@ resource "azurerm_windows_virtual_machine" "windows_vm" {
   lifecycle {
     ignore_changes = [
       tags["CreationTimeUTC"],
-      identity,
+      # identity,
       vm_agent_platform_updates_enabled
     ]
   }
