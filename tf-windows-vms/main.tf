@@ -44,6 +44,11 @@ resource "azurerm_windows_virtual_machine" "windows_vm" {
   availability_set_id = each.value.availability_set_id
   license_type        = var.windows_license_type
 
+  # Enable system-assigned managed identity if specified
+  identity {
+    type = var.enable_system_managed_identity ? "SystemAssigned" : null
+  }
+
   os_disk {
     name                 = "${each.value.name}-osdisk"
     caching              = each.value.os_disk_caching
@@ -55,10 +60,6 @@ resource "azurerm_windows_virtual_machine" "windows_vm" {
     offer     = each.value.source_image_reference.offer
     sku       = each.value.source_image_reference.sku
     version   = each.value.source_image_reference.version
-  }
-
-  identity {
-    type = "SystemAssigned"
   }
 
   # vtpm_enabled = true #TODO: Enable when we have a plan to support it
