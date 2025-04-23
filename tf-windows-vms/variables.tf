@@ -160,12 +160,8 @@ variable "windows_license_type" {
 }
 
 # System Managed Identity configuration for Windows VMs
-variable "enable_system_managed_identity" {
-  description = <<EOT
-  Determines whether to enable system-assigned managed identity for the Windows virtual machines.
-  When enabled, the VM will have a system-assigned identity in Azure Active Directory.
-  This identity can be used to authenticate to Azure services without storing credentials in code.
-  EOT
-  type        = bool
-  default     = true
+variable "identity_type" {
+  description = ""
+  type        = string
+  default     = "SystemAssigned, UserAssigned"
 }
