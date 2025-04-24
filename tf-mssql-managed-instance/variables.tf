@@ -10,6 +10,13 @@ variable "tags" {
   type = map(string)
 }
 
+# Add this new variable
+variable "enable_directory_readers_role" {
+  description = "Whether to grant Directory Readers role to the managed identity of the SQL Managed Instance"
+  type        = bool
+  default     = false
+}
+
 variable "managed_instances" {
   type = map(object({
     license_type       = string
@@ -34,8 +41,6 @@ variable "managed_instances" {
       azuread_authentication_only_enabled = optional(bool, false)
       tenant_id                           = optional(string, null)
     }), null)
-
-
 
     databases = map(string)
 
