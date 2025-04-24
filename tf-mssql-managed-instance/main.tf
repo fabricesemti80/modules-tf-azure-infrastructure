@@ -21,19 +21,6 @@ resource "azurerm_mssql_managed_instance" "managed_instances" {
     identity_ids = each.value.identity_ids
   }
 
-  # (Optional) Azure AD Admin configuration
-  dynamic "azure_active_directory_administrator" {
-    for_each = each.value.azure_ad_admin != null ? [each.value.azure_ad_admin] : []
-
-    content {
-      login_username                      = azure_active_directory_administrator.value.login_username
-      object_id                           = azure_active_directory_administrator.value.object_id
-      principal_type                      = azure_active_directory_administrator.value.principal_type
-      azuread_authentication_only_enabled = azure_active_directory_administrator.value.azuread_authentication_only_enabled
-      tenant_id                           = azure_active_directory_administrator.value.tenant_id
-    }
-  }
-
   timeouts {
     create = "60m"
     update = "60m"
@@ -54,12 +41,14 @@ resource "azurerm_mssql_managed_database" "databases" {
   managed_instance_id = azurerm_mssql_managed_instance.managed_instances[each.value.instance_key].id
 }
 
+# Get the Directory Readers role
 resource "azuread_directory_role" "directory_readers" {
   count        = var.enable_directory_readers_role ? 1 : 0
   display_name = "Directory Readers"
 }
 
-resource "azuread_directory_role_assignment" "sql_mi_directory_readers" {
+# Assign Directory Readers role to SQL MI managed identities
+resource "azuread_directory_role_member" "sql_mi_directory_readers" {
   for_each = {
     for key, instance in azurerm_mssql_managed_instance.managed_instances :
     key => instance if var.enable_directory_readers_role &&
@@ -67,7 +56,20 @@ resource "azuread_directory_role_assignment" "sql_mi_directory_readers" {
     instance.identity[0].type == "SystemAssigned,UserAssigned")
   }
 
-  # Use the object_id attribute which contains the actual UUID
-  role_id             = azuread_directory_role.directory_readers[0].object_id
-  principal_object_id = each.value.identity[0].principal_id
+  role_object_id   = azuread_directory_role.directory_readers[0].object_id
+  member_object_id = each.value.identity[0].principal_id
+}
+
+# Set Azure AD Administrator for SQL Managed Instances
+resource "azurerm_mssql_managed_instance_active_directory_administrator" "admin" {
+  for_each = {
+    for key, instance in var.managed_instances :
+    key => instance if instance.azure_ad_admin != null
+  }
+
+  managed_instance_id         = azurerm_mssql_managed_instance.managed_instances[each.key].id
+  login_username              = each.value.azure_ad_admin.login_username
+  object_id                   = each.value.azure_ad_admin.object_id
+  tenant_id                   = each.value.azure_ad_admin.tenant_id
+  azuread_authentication_only = each.value.azure_ad_admin.azuread_authentication_only_enabled
 }
