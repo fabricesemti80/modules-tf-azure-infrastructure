@@ -44,14 +44,3 @@ variable "tags" {
   default     = {}
 }
 
-# This is inferred from the main.tf file which uses local.databases
-locals {
-  databases = flatten([
-    for instance_key, instance in var.managed_instances : [
-      for db_name in instance.databases : {
-        name         = db_name
-        instance_key = instance_key
-      }
-    ]
-  ])
-}
