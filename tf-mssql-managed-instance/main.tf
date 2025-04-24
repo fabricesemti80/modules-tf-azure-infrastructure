@@ -26,6 +26,11 @@ resource "azurerm_mssql_managed_instance" "managed_instances" {
     }
   }
 
+  identity {
+    type         = lookup(each.value, "identity_type", "SystemAssigned")
+    identity_ids = lookup(each.value, "identity_ids", null)
+  }
+
   timeouts {
     create = "60m"
     update = "60m"
