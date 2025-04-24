@@ -54,8 +54,6 @@ resource "azurerm_mssql_managed_database" "databases" {
   managed_instance_id = azurerm_mssql_managed_instance.managed_instances[each.value.instance_key].id
 }
 
-# Add these new resources after the azurerm_mssql_managed_instance resource
-# Add Directory Readers role assignment for the managed identity
 resource "azuread_directory_role" "directory_readers" {
   count        = var.enable_directory_readers_role ? 1 : 0
   display_name = "Directory Readers"
@@ -69,6 +67,7 @@ resource "azuread_directory_role_assignment" "sql_mi_directory_readers" {
     instance.identity[0].type == "SystemAssigned,UserAssigned")
   }
 
-  role_id             = azuread_directory_role.directory_readers[0].id
+  # Use the object_id attribute which contains the actual UUID
+  role_id             = azuread_directory_role.directory_readers[0].object_id
   principal_object_id = each.value.identity[0].principal_id
 }
