@@ -48,7 +48,7 @@ resource "azuread_directory_role" "directory_readers" {
 }
 
 # Assign Directory Readers role to SQL MI managed identities
-resource "azuread_directory_role_member" "sql_mi_directory_readers" {
+resource "azuread_directory_role_assignment" "sql_mi_directory_readers" {
   for_each = {
     for key, instance in azurerm_mssql_managed_instance.managed_instances :
     key => instance if var.enable_directory_readers_role &&
@@ -56,8 +56,8 @@ resource "azuread_directory_role_member" "sql_mi_directory_readers" {
     instance.identity[0].type == "SystemAssigned,UserAssigned")
   }
 
-  role_object_id   = azuread_directory_role.directory_readers[0].object_id
-  member_object_id = each.value.identity[0].principal_id
+  role_id             = azuread_directory_role.directory_readers[0].template_id
+  principal_object_id = each.value.identity[0].principal_id
 }
 
 # Set Azure AD Administrator for SQL Managed Instances
@@ -72,4 +72,10 @@ resource "azurerm_mssql_managed_instance_active_directory_administrator" "admin"
   object_id                   = each.value.azure_ad_admin.object_id
   tenant_id                   = each.value.azure_ad_admin.tenant_id
   azuread_authentication_only = each.value.azure_ad_admin.azuread_authentication_only_enabled
+
+  # This explicit dependency ensures the Directory Readers role is assigned before setting the AD admin
+  depends_on = [
+    azuread_directory_role_assignment.sql_mi_directory_readers
+  ]
 }
+
