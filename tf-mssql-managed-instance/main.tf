@@ -11,9 +11,17 @@ resource "azurerm_mssql_managed_instance" "managed_instances" {
   vcores             = each.value.vcores
   subnet_id          = each.value.subnet_id
 
+  # Local - SA - authentication
   administrator_login          = each.value.administrator_login
   administrator_login_password = each.value.administrator_login_password
 
+  # Managed Identity configuration (AzureADmin pre-requisite)
+  identity {
+    type         = each.value.identity_type
+    identity_ids = each.value.identity_ids
+  }
+
+  # (Optional) Azure AD Admin configuration
   dynamic "azure_active_directory_administrator" {
     for_each = each.value.azure_ad_admin != null ? [each.value.azure_ad_admin] : []
 
@@ -24,11 +32,6 @@ resource "azurerm_mssql_managed_instance" "managed_instances" {
       azuread_authentication_only_enabled = azure_active_directory_administrator.value.azuread_authentication_only_enabled
       tenant_id                           = azure_active_directory_administrator.value.tenant_id
     }
-  }
-
-  identity {
-    type         = lookup(each.value, "identity_type", "SystemAssigned")
-    identity_ids = lookup(each.value, "identity_ids", null)
   }
 
   timeouts {

@@ -1,15 +1,16 @@
 variable "resource_group_name" {
-  description = "The name of the resource group in which to create the SQL Managed Instance"
-  type        = string
+  type = string
 }
 
 variable "location" {
-  description = "The Azure region in which to create the SQL Managed Instance"
-  type        = string
+  type = string
+}
+
+variable "tags" {
+  type = map(string)
 }
 
 variable "managed_instances" {
-  description = "Map of SQL Managed Instances to create"
   type = map(object({
     license_type       = string
     sku_name           = string
@@ -17,30 +18,26 @@ variable "managed_instances" {
     vcores             = number
     subnet_id          = string
 
+    # Local - SA - authentication
     administrator_login          = string
     administrator_login_password = string
 
-    # Identity configuration
-    identity_type = optional(string)
+    # Managed Identity configuration (AzureADmin pre-requisite)
+    identity_type = optional(string, "SystemAssigned")
     identity_ids  = optional(list(string))
 
-    # Azure AD Admin configuration
+    # (Optional) Azure AD Admin configuration
     azure_ad_admin = optional(object({
       login_username                      = string
       object_id                           = string
-      principal_type                      = optional(string)
+      principal_type                      = string
       azuread_authentication_only_enabled = optional(bool, false)
-      tenant_id                           = optional(string)
-    }))
+      tenant_id                           = optional(string, null)
+    }), null)
 
-    # Databases to create in this instance
-    databases = optional(list(string), [])
+
+
+    databases = map(string)
+
   }))
 }
-
-variable "tags" {
-  description = "A mapping of tags to assign to the resources"
-  type        = map(string)
-  default     = {}
-}
-
