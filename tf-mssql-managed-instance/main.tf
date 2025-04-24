@@ -14,6 +14,18 @@ resource "azurerm_mssql_managed_instance" "managed_instances" {
   administrator_login          = each.value.administrator_login
   administrator_login_password = each.value.administrator_login_password
 
+  dynamic "azure_active_directory_administrator" {
+    for_each = each.value.azure_ad_admin != null ? [each.value.azure_ad_admin] : []
+
+    content {
+      login_username                      = azure_active_directory_administrator.value.login_username
+      object_id                           = azure_active_directory_administrator.value.object_id
+      principal_type                      = azure_active_directory_administrator.value.principal_type
+      azuread_authentication_only_enabled = azure_active_directory_administrator.value.azuread_authentication_only_enabled
+      tenant_id                           = azure_active_directory_administrator.value.tenant_id
+    }
+  }
+
   timeouts {
     create = "60m"
     update = "60m"

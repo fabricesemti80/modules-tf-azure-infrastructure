@@ -28,3 +28,8 @@ output "managed_database_names" {
   description = "Map of Managed Database names"
   value       = { for k, v in azurerm_mssql_managed_database.databases : k => v.name }
 }
+
+output "managed_instance_azure_ad_admins" {
+  description = "Map of Managed Instance Azure AD administrators"
+  value       = { for k, v in azurerm_mssql_managed_instance.managed_instances : k => v.azure_active_directory_administrator if length(v.azure_active_directory_administrator) > 0 }
+}
