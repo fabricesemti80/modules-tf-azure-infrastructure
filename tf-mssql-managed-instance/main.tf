@@ -39,7 +39,28 @@ resource "azurerm_mssql_managed_database" "databases" {
 
   name                = each.value.name
   managed_instance_id = azurerm_mssql_managed_instance.managed_instances[each.value.instance_key].id
+
+  # Add backup configurations if available
+  short_term_retention_days = try(each.value.short_term_retention_days, 7)
+
+  # Add long-term retention policy if configured
+  dynamic "long_term_retention_policy" {
+    for_each = try(each.value.long_term_retention_policy != null ? [each.value.long_term_retention_policy] : [], [])
+
+    content {
+      weekly_retention  = long_term_retention_policy.value.weekly_retention
+      monthly_retention = long_term_retention_policy.value.monthly_retention
+      yearly_retention  = long_term_retention_policy.value.yearly_retention
+      week_of_year      = long_term_retention_policy.value.week_of_year
+    }
+  }
+
+  # Add lifecycle block to prevent accidental deletion
+  lifecycle {
+    prevent_destroy = true
+  }
 }
+
 
 # Get the Directory Readers role
 resource "azuread_directory_role" "directory_readers" {
