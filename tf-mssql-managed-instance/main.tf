@@ -100,3 +100,41 @@ resource "azurerm_mssql_managed_instance_active_directory_administrator" "admin"
   ]
 }
 
+# Create private endpoints for SQL Managed Instances
+resource "azurerm_private_endpoint" "sql_mi_private_endpoints" {
+  for_each = local.private_endpoints
+
+  name                = each.value.name
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  subnet_id           = each.value.subnet_id
+
+  custom_network_interface_name = each.value.custom_network_interface_name
+  tags                          = each.value.tags
+
+  private_service_connection {
+    name                           = each.value.private_service_connection_name
+    private_connection_resource_id = each.value.resource_id
+    is_manual_connection           = each.value.is_manual_connection
+    subresource_names              = each.value.subresource_names
+  }
+
+  dynamic "ip_configuration" {
+    for_each = each.value.ip_configuration
+    content {
+      name               = ip_configuration.value.name
+      private_ip_address = ip_configuration.value.private_ip_address
+      subresource_name   = ip_configuration.value.subresource_name
+      member_name        = ip_configuration.value.member_name
+    }
+  }
+
+  dynamic "private_dns_zone_group" {
+    for_each = length(each.value.private_dns_zone_ids) > 0 ? [1] : []
+    content {
+      name                 = "${each.value.name}-dns-zone-group"
+      private_dns_zone_ids = each.value.private_dns_zone_ids
+    }
+  }
+}
+

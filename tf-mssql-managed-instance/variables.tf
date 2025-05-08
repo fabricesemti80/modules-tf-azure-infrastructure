@@ -36,16 +36,33 @@ variable "managed_instances" {
       azuread_authentication_only_enabled = bool
     }))
     databases = optional(map(object({
-      # You can keep using a simple string if you don't need backup configs
-      # or use an object for more advanced configurations
       name                      = string
-      short_term_retention_days = optional(number, 7) # by default we keep 7 days
+      short_term_retention_days = optional(number, 7)
       long_term_retention_policy = optional(object({
         weekly_retention  = optional(string, "PT0S")
         monthly_retention = optional(string, "PT0S")
         yearly_retention  = optional(string, "PT0S")
         week_of_year      = optional(number, 0)
       }), null)
-    })), {}) # Default to empty map if not provided
+    })), {})
+
+    # Add private endpoint configuration as an optional attribute
+    private_endpoint = optional(object({
+      name                            = optional(string)
+      subnet_id                       = string
+      is_manual_connection            = optional(bool, false)
+      private_service_connection_name = optional(string)
+      private_dns_zone_ids            = optional(list(string), [])
+      subresource_names               = optional(list(string), ["managedInstance"])
+      custom_network_interface_name   = optional(string)
+      ip_configuration = optional(list(object({
+        name               = string
+        private_ip_address = string
+        subresource_name   = string
+        member_name        = optional(string)
+      })), [])
+      tags = optional(map(string), {})
+    }))
   }))
 }
+
