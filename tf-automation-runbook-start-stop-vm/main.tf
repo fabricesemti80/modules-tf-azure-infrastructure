@@ -64,4 +64,8 @@ resource "azurerm_automation_job_schedule" "vm-start-stop" {
   depends_on = [
     azurerm_automation_schedule.vm-start-stop
   ]
+
+  lifecycle {
+    ignore_changes = [parameters]
+  }
 }
