@@ -28,18 +28,18 @@ resource "azurerm_network_interface" "windows_nic" {
 
 # Virtual Machine for Windows Deployment
 resource "azurerm_windows_virtual_machine" "windows_vm" {
-  for_each                          = var.windows_vms_config
-  name                              = each.value.name
-  computer_name                     = each.key
-  location                          = var.azure_region
-  resource_group_name               = var.resource_group_name
-  size                              = each.value.size
-  admin_username                    = each.value.login_username
-  admin_password                    = each.value.login_password
-  network_interface_ids             = [azurerm_network_interface.windows_nic[each.key].id]
-  patch_assessment_mode             = each.value.patch_assessment_mode
-  vm_agent_platform_updates_enabled = true
-  provision_vm_agent                = true
+  for_each              = var.windows_vms_config
+  name                  = each.value.name
+  computer_name         = each.key
+  location              = var.azure_region
+  resource_group_name   = var.resource_group_name
+  size                  = each.value.size
+  admin_username        = each.value.login_username
+  admin_password        = each.value.login_password
+  network_interface_ids = [azurerm_network_interface.windows_nic[each.key].id]
+  patch_assessment_mode = each.value.patch_assessment_mode
+  # vm_agent_platform_updates_enabled = true
+  provision_vm_agent = true
 
   availability_set_id = each.value.availability_set_id
   license_type        = var.windows_license_type
@@ -69,7 +69,7 @@ resource "azurerm_windows_virtual_machine" "windows_vm" {
     ignore_changes = [
       tags["CreationTimeUTC"],
       identity[0].identity_ids,
-      vm_agent_platform_updates_enabled
+      # vm_agent_platform_updates_enabled
     ]
   }
 
