@@ -24,6 +24,7 @@ output "windows_virtual_machines" {
       os_disk_name        = v.os_disk[0].name
       tags                = v.tags
       id                  = v.id
+      identity            = v.identity
     }
   }
 }
