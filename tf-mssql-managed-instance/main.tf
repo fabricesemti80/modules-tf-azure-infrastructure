@@ -112,6 +112,12 @@ resource "azurerm_private_endpoint" "sql_mi_private_endpoints" {
   custom_network_interface_name = each.value.custom_network_interface_name
   tags                          = each.value.tags
 
+  lifecycle {
+    ignore_changes = [
+      tags["CreationTimeUTC"]
+    ]
+  }
+
   private_service_connection {
     name                           = each.value.private_service_connection_name
     private_connection_resource_id = each.value.resource_id
