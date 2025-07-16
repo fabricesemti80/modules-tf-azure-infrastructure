@@ -1,3 +1,8 @@
+output "resources" {
+  description = "Map of Managed Instance resource objects"
+  value       = azurerm_mssql_managed_instance.managed_instances
+}
+
 # output "managed_instance_ids" {
 #   description = "Map of Managed Instance IDs"
 #   value       = { for k, v in azurerm_mssql_managed_instance.managed_instances : k => v.id }
