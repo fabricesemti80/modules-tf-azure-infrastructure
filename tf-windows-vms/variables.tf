@@ -165,3 +165,10 @@ variable "identity_type" {
   type        = string
   default     = "SystemAssigned, UserAssigned"
 }
+
+# User Assigned Identity IDs
+variable "identity_ids" {
+  description = ""
+  type        = list(string)
+  default     = []
+}
