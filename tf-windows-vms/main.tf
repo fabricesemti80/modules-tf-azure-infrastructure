@@ -46,7 +46,7 @@ resource "azurerm_windows_virtual_machine" "windows_vm" {
 
   # Enable system-assigned managed identity if specified
   identity {
-    type = var.identity_type
+    type         = var.identity_type
     identity_ids = var.identity_type == "SystemAssigned" ? null : []
   }
 
@@ -69,7 +69,7 @@ resource "azurerm_windows_virtual_machine" "windows_vm" {
   lifecycle {
     ignore_changes = [
       tags["CreationTimeUTC"],
-      identity[0].identity_ids,
+      identity,
       # vm_agent_platform_updates_enabled
     ]
   }
