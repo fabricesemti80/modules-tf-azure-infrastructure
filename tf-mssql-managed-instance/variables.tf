@@ -27,6 +27,7 @@ variable "managed_instances" {
     subnet_id                    = string
     administrator_login          = string
     administrator_login_password = string
+    proxy_override               = optional(string, "Default")
     identity_type                = string
     identity_ids                 = list(string)
     azure_ad_admin = optional(object({
@@ -65,4 +66,3 @@ variable "managed_instances" {
     }))
   }))
 }
-

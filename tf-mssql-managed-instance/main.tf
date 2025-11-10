@@ -10,6 +10,7 @@ resource "azurerm_mssql_managed_instance" "managed_instances" {
   storage_size_in_gb = each.value.storage_size_in_gb
   vcores             = each.value.vcores
   subnet_id          = each.value.subnet_id
+  proxy_override     = each.value.proxy_override
 
   # Local - SA - authentication
   administrator_login          = each.value.administrator_login
@@ -143,4 +144,3 @@ resource "azurerm_private_endpoint" "sql_mi_private_endpoints" {
     }
   }
 }
-
